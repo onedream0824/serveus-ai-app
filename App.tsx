@@ -16,6 +16,27 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { StatusBar, useColorScheme } from 'react-native';
 import { uploadPhotoAsync } from './src/services/uploadService';
 import type { UploadJob, UploadJobStatus } from './src/types/upload';
+import Toast from 'react-native-toast-message';
+
+const COLORS = {
+  bg: '#0c0f14',
+  surface: '#161a22',
+  surfaceElevated: '#1c2129',
+  border: '#2a3142',
+  text: '#f0f2f5',
+  textSecondary: '#8b92a5',
+  textMuted: '#5c6378',
+  accent: '#6366f1',
+  accentSoft: 'rgba(99, 102, 241, 0.15)',
+  success: '#22c55e',
+  successSoft: 'rgba(34, 197, 94, 0.12)',
+  error: '#ef4444',
+  errorSoft: 'rgba(239, 68, 68, 0.12)',
+  warning: '#f59e0b',
+  warningSoft: 'rgba(245, 158, 11, 0.12)',
+  info: '#3b82f6',
+  infoSoft: 'rgba(59, 130, 246, 0.12)',
+};
 
 function makeJobId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -49,40 +70,80 @@ function handleImageResult(result: ImagePickerResponse): {
   };
 }
 
-const STATUS_EMOJI: Record<UploadJobStatus, string> = {
-  Queued: '⏳',
-  Uploading: '🔄',
-  Success: '✅',
-  Failed: '❌',
-};
+function statusStyle(status: UploadJobStatus): { bg: string; text: string } {
+  switch (status) {
+    case 'Queued':
+      return { bg: COLORS.warningSoft, text: COLORS.warning };
+    case 'Uploading':
+      return { bg: COLORS.infoSoft, text: COLORS.info };
+    case 'Success':
+      return { bg: COLORS.successSoft, text: COLORS.success };
+    case 'Failed':
+      return { bg: COLORS.errorSoft, text: COLORS.error };
+  }
+}
 
 function HomeScreen({
   insets,
   onOpenCamera,
   onChooseFromGallery,
   onViewLogs,
+  pendingCount,
 }: {
   insets: { top: number; bottom: number };
   onOpenCamera: () => void;
   onChooseFromGallery: () => void;
   onViewLogs: () => void;
+  pendingCount: number;
 }) {
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <Text style={styles.title}>Serveus</Text>
-      <Text style={styles.subtitle}>Photos are queued and uploaded in the background</Text>
+    <View style={[styles.screen, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <View style={styles.hero}>
+        <Text style={styles.brand}>Serveus</Text>
+        <Text style={styles.tagline}>
+          Capture or pick a photo. We’ll upload it in the background.
+        </Text>
+      </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button} onPress={onOpenCamera} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Open Camera</Text>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={onOpenCamera}
+          activeOpacity={0.85}
+        >
+          <View style={styles.buttonIcon}>
+            <Text style={styles.buttonIconText}>📷</Text>
+          </View>
+          <View style={styles.primaryButtonTextWrap}>
+            <Text style={styles.primaryButtonLabel}>Open Camera</Text>
+            <Text style={styles.primaryButtonHint}>Take a new photo</Text>
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={onChooseFromGallery} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Choose from Gallery</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonSecondary} onPress={onViewLogs} activeOpacity={0.8}>
-          <Text style={styles.buttonSecondaryText}>View logs</Text>
+
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={onChooseFromGallery}
+          activeOpacity={0.85}
+        >
+          <View style={styles.buttonIcon}>
+            <Text style={styles.buttonIconText}>🖼</Text>
+          </View>
+          <View style={styles.primaryButtonTextWrap}>
+            <Text style={styles.primaryButtonLabel}>Choose from Gallery</Text>
+            <Text style={styles.primaryButtonHint}>Select from library</Text>
+          </View>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.logsCta} onPress={onViewLogs} activeOpacity={0.8}>
+        <Text style={styles.logsCtaLabel}>View upload logs</Text>
+        {pendingCount > 0 ? (
+          <View style={styles.logsBadge}>
+            <Text style={styles.logsBadgeText}>{pendingCount}</Text>
+          </View>
+        ) : null}
+        <Text style={styles.logsCtaArrow}>→</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -99,17 +160,20 @@ function LogsScreen({
   const renderItem = useCallback(
     ({ item }: { item: UploadJob }) => {
       const label = item.fileName ?? `Photo ${item.id.slice(0, 8)}`;
+      const { bg, text } = statusStyle(item.status);
       return (
-        <View style={styles.logRow}>
-          <Text style={styles.logLabel} numberOfLines={1}>
-            {label}
-          </Text>
-          <Text style={styles.logTime}>{formatTime(item.timestamp)}</Text>
-          <Text style={styles.logStatus}>
-            {STATUS_EMOJI[item.status]} {item.status}
-          </Text>
+        <View style={styles.logCard}>
+          <View style={styles.logCardTop}>
+            <Text style={styles.logCardLabel} numberOfLines={1}>
+              {label}
+            </Text>
+            <View style={[styles.statusPill, { backgroundColor: bg }]}>
+              <Text style={[styles.statusPillText, { color: text }]}>{item.status}</Text>
+            </View>
+          </View>
+          <Text style={styles.logCardTime}>{formatTime(item.timestamp)}</Text>
           {item.error ? (
-            <Text style={styles.logError} numberOfLines={1}>
+            <Text style={styles.logCardError} numberOfLines={2}>
               {item.error}
             </Text>
           ) : null}
@@ -120,21 +184,30 @@ function LogsScreen({
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <View style={[styles.screen, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.logsHeader}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+        <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Text style={styles.backBtnText}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.logsTitle}>Upload logs</Text>
+        <Text style={styles.logsSubtitle}>{jobs.length} item{jobs.length !== 1 ? 's' : ''}</Text>
       </View>
+
       {jobs.length === 0 ? (
-        <Text style={styles.emptyLogs}>No uploads yet. Take or choose a photo to start.</Text>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateIcon}>📤</Text>
+          <Text style={styles.emptyStateTitle}>No uploads yet</Text>
+          <Text style={styles.emptyStateText}>
+            Take a photo or choose one from your gallery to see upload logs here.
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={[...jobs].reverse()}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.logListContent}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>
@@ -175,7 +248,7 @@ function AppContent() {
       processingIdRef.current = null;
       return;
     }
-    if (processingIdRef.current === firstQueued.id) return; // already started this job
+    if (processingIdRef.current === firstQueued.id) return;
     processingIdRef.current = firstQueued.id;
 
     const job = firstQueued;
@@ -183,14 +256,31 @@ function AppContent() {
       prev.map((j) => (j.id === job.id ? { ...j, status: 'Uploading' as const } : j))
     );
 
+    const label = job.fileName ?? 'Photo';
+    Toast.show({
+      type: 'info',
+      text1: 'Upload started',
+      text2: label,
+    });
+
     uploadPhotoAsync(job.uri, { fileName: job.fileName, type: job.type })
       .then(() => {
         setJobStatus(job.id, 'Success');
         processingIdRef.current = null;
+        Toast.show({
+          type: 'success',
+          text1: 'Upload successful',
+          text2: label,
+        });
       })
       .catch((err) => {
         setJobStatus(job.id, 'Failed', err?.message ?? 'Upload failed');
         processingIdRef.current = null;
+        Toast.show({
+          type: 'error',
+          text1: 'Upload failed',
+          text2: err?.message ?? label,
+        });
       });
   }, [uploadQueue, setJobStatus]);
 
@@ -218,12 +308,17 @@ function AppContent() {
     );
   }
 
+  const pendingCount = uploadQueue.filter(
+    (j) => j.status === 'Queued' || j.status === 'Uploading'
+  ).length;
+
   return (
     <HomeScreen
       insets={insets}
       onOpenCamera={onOpenCamera}
       onChooseFromGallery={onChooseFromGallery}
       onViewLogs={() => setScreen('logs')}
+      pendingCount={pendingCount}
     />
   );
 }
@@ -235,107 +330,194 @@ function App() {
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <AppContent />
+      <Toast />
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: COLORS.bg,
     paddingHorizontal: 24,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#f8fafc',
-    marginTop: 24,
+  // —— Home ——
+  hero: {
+    marginTop: 32,
+    marginBottom: 40,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#94a3b8',
-    marginTop: 4,
+  brand: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: COLORS.text,
+    letterSpacing: -0.5,
+  },
+  tagline: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    marginTop: 10,
+    lineHeight: 24,
+    maxWidth: 300,
   },
   actions: {
-    marginTop: 40,
-    gap: 12,
+    gap: 14,
   },
-  button: {
-    backgroundColor: '#3b82f6',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  buttonSecondary: {
-    backgroundColor: 'transparent',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+  primaryButton: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 20,
     borderWidth: 1,
-    borderColor: '#475569',
-  },
-  buttonSecondaryText: {
-    color: '#94a3b8',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  logsHeader: {
+    borderColor: COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 16,
   },
-  backButton: {
-    paddingVertical: 8,
-    paddingRight: 16,
+  buttonIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: COLORS.accentSoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
   },
-  backButtonText: {
-    color: '#3b82f6',
+  buttonIconText: {
+    fontSize: 24,
+  },
+  primaryButtonTextWrap: {
+    flex: 1,
+  },
+  primaryButtonLabel: {
     fontSize: 17,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  primaryButtonHint: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  logsCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 32,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+  },
+  logsCtaLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.accent,
+  },
+  logsBadge: {
+    backgroundColor: COLORS.accent,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+    paddingHorizontal: 6,
+  },
+  logsBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  logsCtaArrow: {
+    fontSize: 16,
+    color: COLORS.accent,
+    marginLeft: 6,
+  },
+  logsHeader: {
+    marginBottom: 24,
+  },
+  backBtn: {
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingRight: 12,
+    marginBottom: 8,
+  },
+  backBtnText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.accent,
   },
   logsTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#f8fafc',
+    fontSize: 28,
+    fontWeight: '800',
+    color: COLORS.text,
+    letterSpacing: -0.3,
   },
-  emptyLogs: {
-    color: '#64748b',
+  logsSubtitle: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  emptyStateIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  emptyStateTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  emptyStateText: {
     fontSize: 15,
-    marginTop: 24,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   logListContent: {
-    paddingBottom: 24,
+    paddingBottom: 32,
   },
-  logRow: {
-    backgroundColor: '#1e293b',
-    borderRadius: 12,
-    padding: 16,
+  logCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 18,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  logLabel: {
-    color: '#f8fafc',
+  logCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  logCardLabel: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.text,
+    flex: 1,
   },
-  logTime: {
-    color: '#94a3b8',
-    fontSize: 13,
-    marginTop: 4,
+  statusPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
-  logStatus: {
-    color: '#cbd5e1',
-    fontSize: 14,
-    marginTop: 6,
-  },
-  logError: {
-    color: '#f87171',
+  statusPillText: {
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  logCardTime: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 8,
+  },
+  logCardError: {
+    fontSize: 12,
+    color: COLORS.error,
+    marginTop: 8,
+    lineHeight: 18,
   },
 });
 
