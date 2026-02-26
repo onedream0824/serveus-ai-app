@@ -19,15 +19,17 @@ import type { UploadJob, UploadJobStatus } from './src/types/upload';
 import Toast from 'react-native-toast-message';
 
 const COLORS = {
-  bg: '#0c0f14',
-  surface: '#161a22',
-  surfaceElevated: '#1c2129',
-  border: '#2a3142',
-  text: '#f0f2f5',
-  textSecondary: '#8b92a5',
+  bg: '#080a0e',
+  bgSoft: '#0c0f14',
+  surface: '#12151c',
+  surfaceElevated: '#1a1f28',
+  border: '#252b36',
+  text: '#f2f4f8',
+  textSecondary: '#8890a4',
   textMuted: '#5c6378',
   accent: '#6366f1',
-  accentSoft: 'rgba(99, 102, 241, 0.15)',
+  accentSoft: 'rgba(99, 102, 241, 0.18)',
+  accentGlow: 'rgba(99, 102, 241, 0.25)',
   success: '#22c55e',
   successSoft: 'rgba(34, 197, 94, 0.12)',
   error: '#ef4444',
@@ -97,11 +99,12 @@ function HomeScreen({
   pendingCount: number;
 }) {
   return (
-    <View style={[styles.screen, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <View style={[styles.homeScreen, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.hero}>
+        <View style={styles.heroAccent} />
         <Text style={styles.brand}>Serveus</Text>
         <Text style={styles.tagline}>
-          Capture or pick a photo. We’ll upload it in the background.
+          Photo uploads, simplified. Capture or pick — we’ll handle the rest in the background.
         </Text>
       </View>
 
@@ -109,29 +112,31 @@ function HomeScreen({
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={onOpenCamera}
-          activeOpacity={0.85}
+          activeOpacity={0.88}
         >
-          <View style={styles.buttonIcon}>
+          <View style={[styles.buttonIcon, styles.buttonIconCamera]}>
             <Text style={styles.buttonIconText}>📷</Text>
           </View>
           <View style={styles.primaryButtonTextWrap}>
             <Text style={styles.primaryButtonLabel}>Open Camera</Text>
             <Text style={styles.primaryButtonHint}>Take a new photo</Text>
           </View>
+          <Text style={styles.primaryButtonChevron}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={onChooseFromGallery}
-          activeOpacity={0.85}
+          activeOpacity={0.88}
         >
-          <View style={styles.buttonIcon}>
+          <View style={[styles.buttonIcon, styles.buttonIconGallery]}>
             <Text style={styles.buttonIconText}>🖼</Text>
           </View>
           <View style={styles.primaryButtonTextWrap}>
             <Text style={styles.primaryButtonLabel}>Choose from Gallery</Text>
-            <Text style={styles.primaryButtonHint}>Select from library</Text>
+            <Text style={styles.primaryButtonHint}>Select from your library</Text>
           </View>
+          <Text style={styles.primaryButtonChevron}>›</Text>
         </TouchableOpacity>
       </View>
 
@@ -341,30 +346,41 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
     paddingHorizontal: 24,
   },
-  // —— Home ——
+  homeScreen: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+    paddingHorizontal: 28,
+  },
   hero: {
-    marginTop: 32,
-    marginBottom: 40,
+    marginTop: 40,
+    marginBottom: 44,
+  },
+  heroAccent: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.accent,
+    marginBottom: 20,
   },
   brand: {
-    fontSize: 34,
+    fontSize: 38,
     fontWeight: '800',
     color: COLORS.text,
-    letterSpacing: -0.5,
+    letterSpacing: -0.8,
   },
   tagline: {
     fontSize: 16,
     color: COLORS.textSecondary,
-    marginTop: 10,
+    marginTop: 12,
     lineHeight: 24,
-    maxWidth: 300,
+    maxWidth: 320,
   },
   actions: {
-    gap: 14,
+    gap: 12,
   },
   primaryButton: {
     backgroundColor: COLORS.surface,
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -372,35 +388,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: COLORS.accentSoft,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 18,
+  },
+  buttonIconCamera: {
+    backgroundColor: COLORS.accentSoft,
+  },
+  buttonIconGallery: {
+    backgroundColor: COLORS.accentSoft,
   },
   buttonIconText: {
-    fontSize: 24,
+    fontSize: 26,
   },
   primaryButtonTextWrap: {
     flex: 1,
   },
   primaryButtonLabel: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.text,
   },
   primaryButtonHint: {
     fontSize: 13,
     color: COLORS.textMuted,
-    marginTop: 2,
+    marginTop: 3,
+  },
+  primaryButtonChevron: {
+    fontSize: 24,
+    fontWeight: '300',
+    color: COLORS.textMuted,
   },
   logsCta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 32,
-    paddingVertical: 14,
+    marginTop: 36,
+    paddingVertical: 16,
     paddingHorizontal: 4,
   },
   logsCtaLabel: {
@@ -410,12 +436,12 @@ const styles = StyleSheet.create({
   },
   logsBadge: {
     backgroundColor: COLORS.accent,
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: 10,
     paddingHorizontal: 6,
   },
   logsBadgeText: {
@@ -424,7 +450,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   logsCtaArrow: {
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.accent,
     marginLeft: 6,
   },
