@@ -16,6 +16,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { StatusBar, useColorScheme } from 'react-native';
 import { uploadPhotoAsync } from './src/services/uploadService';
 import type { UploadJob, UploadJobStatus } from './src/types/upload';
+import Toast from 'react-native-toast-message';
 
 function makeJobId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -123,7 +124,7 @@ function LogsScreen({
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.logsHeader}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.logsTitle}>Upload logs</Text>
       </View>
@@ -175,7 +176,7 @@ function AppContent() {
       processingIdRef.current = null;
       return;
     }
-    if (processingIdRef.current === firstQueued.id) return; // already started this job
+    if (processingIdRef.current === firstQueued.id) return;
     processingIdRef.current = firstQueued.id;
 
     const job = firstQueued;
@@ -183,14 +184,31 @@ function AppContent() {
       prev.map((j) => (j.id === job.id ? { ...j, status: 'Uploading' as const } : j))
     );
 
+    const label = job.fileName ?? 'Photo';
+    Toast.show({
+      type: 'info',
+      text1: 'Upload started',
+      text2: label,
+    });
+
     uploadPhotoAsync(job.uri, { fileName: job.fileName, type: job.type })
       .then(() => {
         setJobStatus(job.id, 'Success');
         processingIdRef.current = null;
+        Toast.show({
+          type: 'success',
+          text1: 'Upload successful',
+          text2: label,
+        });
       })
       .catch((err) => {
         setJobStatus(job.id, 'Failed', err?.message ?? 'Upload failed');
         processingIdRef.current = null;
+        Toast.show({
+          type: 'error',
+          text1: 'Upload failed',
+          text2: err?.message ?? label,
+        });
       });
   }, [uploadQueue, setJobStatus]);
 
@@ -235,6 +253,7 @@ function App() {
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <AppContent />
+      <Toast />
     </SafeAreaProvider>
   );
 }
