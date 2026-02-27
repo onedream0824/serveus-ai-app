@@ -10,4 +10,5 @@ export interface UploadPhoto {
   error?: string;
   fileId?: string;
   fileUrl?: string;
+  uploadId?: string;
 }
