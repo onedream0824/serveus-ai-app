@@ -4,7 +4,7 @@ import { colors } from '../../theme';
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: 'transparent',
     paddingHorizontal: 24,
   },
   logsHeader: {
@@ -58,12 +58,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   logCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 18,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+  },
+  logCardInner: {
+    padding: 18,
   },
   logCardTop: {
     flexDirection: 'row',
