@@ -122,14 +122,18 @@ class BackgroundUpload: RCTEventEmitter, URLSessionDelegate, URLSessionTaskDeleg
         ["status": "failed", "error": error.localizedDescription],
         forKey: "upload_\(uploadId)"
       )
-      sendEvent(withName: "uploadFailed", body: ["uploadId": uploadId, "error": error.localizedDescription])
+      if bridge != nil {
+        sendEvent(withName: "uploadFailed", body: ["uploadId": uploadId, "error": error.localizedDescription])
+      }
     } else if let data = responseData[taskId],
               let responseString = String(data: data, encoding: .utf8) {
       UserDefaults.standard.set(
         ["status": "completed", "response": responseString],
         forKey: "upload_\(uploadId)"
       )
-      sendEvent(withName: "uploadComplete", body: ["uploadId": uploadId, "response": responseString])
+      if bridge != nil {
+        sendEvent(withName: "uploadComplete", body: ["uploadId": uploadId, "response": responseString])
+      }
     }
     responseData.removeValue(forKey: taskId)
   }
@@ -139,7 +143,9 @@ class BackgroundUpload: RCTEventEmitter, URLSessionDelegate, URLSessionTaskDeleg
     let progress = totalBytesExpectedToSend > 0
       ? Double(totalBytesSent) / Double(totalBytesExpectedToSend) * 100
       : 0
-    sendEvent(withName: "uploadProgress", body: ["uploadId": uploadId, "progress": progress])
+    if bridge != nil {
+      sendEvent(withName: "uploadProgress", body: ["uploadId": uploadId, "progress": progress])
+    }
   }
 
   func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {

@@ -30,12 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       in: window,
       launchOptions: launchOptions
     )
-    
-    if launchOptions?[.url] != nil {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        NotificationCenter.default.post(name: NSNotification.Name("BackgroundUploadCheckPending"), object: nil)
-      }
-    }
 
     return true
   }
@@ -46,10 +40,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     completionHandler: @escaping () -> Void
   ) {
     AppDelegate.backgroundCompletionHandler = completionHandler
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-      NotificationCenter.default.post(name: NSNotification.Name("BackgroundUploadCheckPending"), object: nil)
-    }
   }
 }
 
