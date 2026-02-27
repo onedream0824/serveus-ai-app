@@ -84,24 +84,27 @@ export function useUploadQueue() {
               return updated;
             });
 
+            const toasts: Array<{ type: 'success' | 'error'; text2: string }> = [];
             pendingUploads.forEach((pending) => {
               const photo = stored.find((p) => p.uploadId === pending.uploadId);
               if (!photo) return;
-
               if (pending.status === 'completed') {
-                Toast.show({
-                  type: 'success',
-                  text1: 'Upload completed',
-                  text2: photo.fileName || 'Photo',
-                });
+                toasts.push({ type: 'success', text2: photo.fileName || 'Photo' });
               } else if (pending.status === 'failed') {
-                Toast.show({
-                  type: 'error',
-                  text1: 'Upload failed',
-                  text2: pending.error || 'Unknown error',
-                });
+                toasts.push({ type: 'error', text2: pending.error || 'Unknown error' });
               }
             });
+            if (toasts.length > 0) {
+              setTimeout(() => {
+                toasts.forEach((t) =>
+                  Toast.show({
+                    type: t.type,
+                    text1: t.type === 'success' ? 'Upload completed' : 'Upload failed',
+                    text2: t.text2,
+                  }),
+                );
+              }, 0);
+            }
           }
         } catch (error) {
           console.log('Could not check pending uploads:', error);
@@ -166,24 +169,27 @@ export function useUploadQueue() {
           return photo;
         });
 
+        const toasts: Array<{ type: 'success' | 'error'; text2: string }> = [];
         pendingUploads.forEach((pending) => {
           const photo = updated.find((p) => p.uploadId === pending.uploadId);
           if (!photo) return;
-
           if (pending.status === 'completed') {
-            Toast.show({
-              type: 'success',
-              text1: 'Upload completed',
-              text2: photo.fileName || 'Photo',
-            });
+            toasts.push({ type: 'success', text2: photo.fileName || 'Photo' });
           } else if (pending.status === 'failed') {
-            Toast.show({
-              type: 'error',
-              text1: 'Upload failed',
-              text2: pending.error || 'Unknown error',
-            });
+            toasts.push({ type: 'error', text2: pending.error || 'Unknown error' });
           }
         });
+        if (toasts.length > 0) {
+          setTimeout(() => {
+            toasts.forEach((t) =>
+              Toast.show({
+                type: t.type,
+                text1: t.type === 'success' ? 'Upload completed' : 'Upload failed',
+                text2: t.text2,
+              }),
+            );
+          }, 0);
+        }
 
         return updated;
       });
@@ -260,12 +266,14 @@ export function useUploadQueue() {
     processingIdRef.current = firstQueued.id;
 
     const photo = firstQueued;
+    const label = photo.fileName ?? 'Photo';
     setUploadQueue((prev) =>
       prev.map((p) => (p.id === photo.id ? { ...p, status: 'Uploading' as const } : p)),
     );
 
-    const label = photo.fileName ?? 'Photo';
-    Toast.show({ type: 'info', text1: 'Upload started', text2: label });
+    setTimeout(() => {
+      Toast.show({ type: 'info', text1: 'Upload started', text2: label });
+    }, 0);
 
     startBackgroundUpload(photo.id, {
       uri: photo.uri,
