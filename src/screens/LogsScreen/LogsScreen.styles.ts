@@ -71,11 +71,19 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
+  logCardLabelBlock: {
+    flex: 1,
+    minWidth: 0,
+  },
   logCardLabel: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
-    flex: 1,
+  },
+  logCardId: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
   },
   statusPill: {
     paddingHorizontal: 12,
