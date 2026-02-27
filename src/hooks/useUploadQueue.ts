@@ -2,34 +2,43 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { uploadPhotoAsync } from '../services/uploadService';
-import type { UploadJob, UploadJobStatus } from '../types/upload';
+import type { UploadPhoto, UploadPhotoStatus } from '../types/upload';
 import { handleImageResult } from '../utils/imagePicker';
-import { makeJobId } from '../utils/format';
+import { makePhotoId } from '../utils/format';
 
 export function useUploadQueue() {
-  const [uploadQueue, setUploadQueue] = React.useState<UploadJob[]>([]);
+  const [uploadQueue, setUploadQueue] = React.useState<UploadPhoto[]>([]);
   const processingIdRef = useRef<string | null>(null);
 
   const addToQueue = useCallback((uri: string, fileName?: string, type?: string) => {
-    const job: UploadJob = {
-      id: makeJobId(),
+    const photo: UploadPhoto = {
+      id: makePhotoId(),
       uri,
       fileName,
       type,
       status: 'Queued',
       timestamp: Date.now(),
     };
-    setUploadQueue((prev) => [...prev, job]);
+    setUploadQueue((prev) => [...prev, photo]);
   }, []);
 
-  const setJobStatus = useCallback((id: string, status: UploadJobStatus, error?: string) => {
-    setUploadQueue((prev) =>
-      prev.map((j) => (j.id === id ? { ...j, status, error } : j))
-    );
-  }, []);
+  const setPhotoStatus = useCallback(
+    (
+      id: string,
+      status: UploadPhotoStatus,
+      extra?: { error?: string; fileId?: string; fileUrl?: string }
+    ) => {
+      setUploadQueue((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, status, ...(extra?.error !== undefined && { error: extra.error }), ...(extra?.fileId !== undefined && { fileId: extra.fileId }), ...(extra?.fileUrl !== undefined && { fileUrl: extra.fileUrl }) } : p
+        )
+      );
+    },
+    []
+  );
 
   useEffect(() => {
-    const firstQueued = uploadQueue.find((j) => j.status === 'Queued');
+    const firstQueued = uploadQueue.find((p) => p.status === 'Queued');
     if (!firstQueued) {
       processingIdRef.current = null;
       return;
@@ -37,22 +46,25 @@ export function useUploadQueue() {
     if (processingIdRef.current === firstQueued.id) return;
     processingIdRef.current = firstQueued.id;
 
-    const job = firstQueued;
+    const photo = firstQueued;
     setUploadQueue((prev) =>
-      prev.map((j) => (j.id === job.id ? { ...j, status: 'Uploading' as const } : j))
+      prev.map((p) => (p.id === photo.id ? { ...p, status: 'Uploading' as const } : p))
     );
 
-    const label = job.fileName ?? 'Photo';
+    const label = photo.fileName ?? 'Photo';
     Toast.show({ type: 'info', text1: 'Upload started', text2: label });
 
-    uploadPhotoAsync(job.uri, { fileName: job.fileName, type: job.type })
-      .then(() => {
-        setJobStatus(job.id, 'Success');
+    uploadPhotoAsync(photo.uri, { fileName: photo.fileName, type: photo.type })
+      .then((result) => {
+        setPhotoStatus(photo.id, 'Success', {
+          fileId: result.fileId,
+          fileUrl: result.fileUrl,
+        });
         processingIdRef.current = null;
         Toast.show({ type: 'success', text1: 'Upload successful', text2: label });
       })
       .catch((err) => {
-        setJobStatus(job.id, 'Failed', err?.message ?? 'Upload failed');
+        setPhotoStatus(photo.id, 'Failed', { error: err?.message ?? 'Upload failed' });
         processingIdRef.current = null;
         Toast.show({
           type: 'error',
@@ -60,7 +72,13 @@ export function useUploadQueue() {
           text2: err?.message ?? label,
         });
       });
-  }, [uploadQueue, setJobStatus]);
+  }, [uploadQueue, setPhotoStatus]);
+
+  const retryUpload = useCallback((photoId: string) => {
+    setUploadQueue((prev) =>
+      prev.map((p) => (p.id === photoId && p.status === 'Failed' ? { ...p, status: 'Queued' as const, error: undefined } : p))
+    );
+  }, []);
 
   const onOpenCamera = useCallback(() => {
     launchCamera({ mediaType: 'photo', saveToPhotos: false }, (res) => {
@@ -81,5 +99,6 @@ export function useUploadQueue() {
     addToQueue,
     onOpenCamera,
     onChooseFromGallery,
+    retryUpload,
   };
 }

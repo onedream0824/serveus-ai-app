@@ -1,2 +1,2 @@
-export { makeJobId, formatTime } from './format';
+export { makePhotoId, formatTime } from './format';
 export { handleImageResult } from './imagePicker';

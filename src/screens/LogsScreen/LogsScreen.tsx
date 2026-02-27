@@ -1,19 +1,35 @@
 import React, { useCallback } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import type { UploadJob } from '../../types/upload';
+import type { UploadPhoto } from '../../types/upload';
 import { getStatusStyle } from '../../theme';
 import { formatTime } from '../../utils/format';
 import { styles } from './LogsScreen.styles';
 
+const STATUS_DISPLAY_LABEL: Record<UploadPhoto['status'], string> = {
+  Queued: 'Queued',
+  Uploading: 'Uploading',
+  Success: 'Uploaded',
+  Failed: 'Failed',
+};
+
 export interface LogsScreenProps {
   insets: { top: number; bottom: number };
-  jobs: UploadJob[];
+  photos: UploadPhoto[];
   onBack: () => void;
+  onRetry?: (photoId: string) => void;
 }
 
-function LogItem({ item }: { item: UploadJob }) {
+function LogItem({
+  item,
+  onRetry,
+}: {
+  item: UploadPhoto;
+  onRetry?: (photoId: string) => void;
+}) {
   const label = item.fileName ?? `Photo ${item.id.slice(0, 8)}`;
   const { bg, text } = getStatusStyle(item.status);
+  const statusLabel = STATUS_DISPLAY_LABEL[item.status];
+
   return (
     <View style={styles.logCard}>
       <View style={styles.logCardTop}>
@@ -21,23 +37,33 @@ function LogItem({ item }: { item: UploadJob }) {
           {label}
         </Text>
         <View style={[styles.statusPill, { backgroundColor: bg }]}>
-          <Text style={[styles.statusPillText, { color: text }]}>{item.status}</Text>
+          <Text style={[styles.statusPillText, { color: text }]}>{statusLabel}</Text>
         </View>
       </View>
       <Text style={styles.logCardTime}>{formatTime(item.timestamp)}</Text>
+      {item.status === 'Success' && item.fileUrl ? (
+        <Text style={styles.logCardFileUrl} numberOfLines={1}>
+          {item.fileUrl}
+        </Text>
+      ) : null}
       {item.error ? (
         <Text style={styles.logCardError} numberOfLines={2}>
           {item.error}
         </Text>
       ) : null}
+      {item.status === 'Failed' && onRetry ? (
+        <TouchableOpacity style={styles.retryButton} onPress={() => onRetry(item.id)}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
 
-export function LogsScreen({ insets, jobs, onBack }: LogsScreenProps) {
+export function LogsScreen({ insets, photos, onBack, onRetry }: LogsScreenProps) {
   const renderItem = useCallback(
-    ({ item }: { item: UploadJob }) => <LogItem item={item} />,
-    []
+    ({ item }: { item: UploadPhoto }) => <LogItem item={item} onRetry={onRetry} />,
+    [onRetry]
   );
 
   return (
@@ -51,10 +77,10 @@ export function LogsScreen({ insets, jobs, onBack }: LogsScreenProps) {
           <Text style={styles.backBtnText}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.logsTitle}>Upload logs</Text>
-        <Text style={styles.logsSubtitle}>{jobs.length} item{jobs.length !== 1 ? 's' : ''}</Text>
+        <Text style={styles.logsSubtitle}>{photos.length} item{photos.length !== 1 ? 's' : ''}</Text>
       </View>
 
-      {jobs.length === 0 ? (
+      {photos.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateIcon}>📤</Text>
           <Text style={styles.emptyStateTitle}>No uploads yet</Text>
@@ -64,7 +90,7 @@ export function LogsScreen({ insets, jobs, onBack }: LogsScreenProps) {
         </View>
       ) : (
         <FlatList
-          data={[...jobs].reverse()}
+          data={[...photos].reverse()}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.logListContent}

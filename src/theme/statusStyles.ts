@@ -1,7 +1,7 @@
-import type { UploadJobStatus } from '../types/upload';
+import type { UploadPhotoStatus } from '../types/upload';
 import { colors } from './colors';
 
-export function getStatusStyle(status: UploadJobStatus): { bg: string; text: string } {
+export function getStatusStyle(status: UploadPhotoStatus): { bg: string; text: string } {
   switch (status) {
     case 'Queued':
       return { bg: colors.warningSoft, text: colors.warning };
