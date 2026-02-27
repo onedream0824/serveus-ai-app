@@ -3,6 +3,8 @@ export const colors = {
   bgSoft: '#0c0f14',
   surface: '#12151c',
   surfaceElevated: '#1a1f28',
+  cardFrosted: 'rgba(28, 32, 44, 0.72)',
+  cardBorder: 'rgba(255, 255, 255, 0.12)',
   border: '#252b36',
   text: '#f2f4f8',
   textSecondary: '#8890a4',

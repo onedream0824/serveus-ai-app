@@ -23,11 +23,14 @@ export function FrostedCard({ children, style, borderRadius = 18 }: FrostedCardP
   return (
     <View style={[styles.wrapper, { borderRadius }, style]}>
       {Platform.OS === 'ios' && BlurView ? (
-        <BlurView
-          style={StyleSheet.absoluteFill}
-          blurType="dark"
-          reducedTransparencyFallbackColor={colors.surface}
-        />
+        <>
+          <BlurView
+            style={[StyleSheet.absoluteFill, styles.blurLayer]}
+            blurType="dark"
+            reducedTransparencyFallbackColor={colors.cardFrosted}
+          />
+          <View style={[StyleSheet.absoluteFill, styles.frostedTint]} />
+        </>
       ) : (
         <View style={[StyleSheet.absoluteFill, styles.androidFallback]} />
       )}
@@ -40,10 +43,23 @@ const styles = StyleSheet.create({
   wrapper: {
     overflow: 'hidden' as const,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
+    backgroundColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  blurLayer: {
+    backgroundColor: 'transparent',
+  },
+  /** One color for every card: same frosted tint on top of blur */
+  frostedTint: {
+    backgroundColor: colors.cardFrosted,
   },
   androidFallback: {
-    backgroundColor: 'rgba(18, 21, 28, 0.92)',
+    backgroundColor: colors.cardFrosted,
   },
   content: {
     flex: 1,
