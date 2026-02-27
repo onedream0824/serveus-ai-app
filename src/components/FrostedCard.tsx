@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   blurLayer: {
     backgroundColor: 'transparent',
   },
-  /** One color for every card: same frosted tint on top of blur */
   frostedTint: {
     backgroundColor: colors.cardFrosted,
   },

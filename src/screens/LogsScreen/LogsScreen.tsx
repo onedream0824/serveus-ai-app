@@ -38,9 +38,14 @@ function LogItem({
       <FrostedCard style={styles.logCard} borderRadius={16}>
         <View style={styles.logCardInner}>
           <View style={styles.logCardTop}>
-            <Text style={styles.logCardLabel} numberOfLines={1}>
-              {label}
-            </Text>
+            <View style={styles.logCardLabelBlock}>
+              <Text style={styles.logCardLabel} numberOfLines={1}>
+                {label}
+              </Text>
+              <Text style={styles.logCardId} numberOfLines={1}>
+                {item.id}
+              </Text>
+            </View>
             <View style={[styles.statusPill, { backgroundColor: bg }]}>
               <Text style={[styles.statusPillText, { color: text }]}>{statusLabel}</Text>
             </View>
