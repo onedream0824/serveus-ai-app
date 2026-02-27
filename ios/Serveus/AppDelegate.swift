@@ -2,7 +2,6 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import react_native_background_upload
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -10,6 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
+
+  static var backgroundCompletionHandler: (() -> Void)?
 
   func application(
     _ application: UIApplication,
@@ -29,6 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       in: window,
       launchOptions: launchOptions
     )
+    
+    if launchOptions?[.url] != nil {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        NotificationCenter.default.post(name: NSNotification.Name("BackgroundUploadCheckPending"), object: nil)
+      }
+    }
 
     return true
   }
@@ -38,7 +45,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     handleEventsForBackgroundURLSession identifier: String,
     completionHandler: @escaping () -> Void
   ) {
-    RNUploader.setCompletionHandler(completionHandler, forSession: identifier)
+    AppDelegate.backgroundCompletionHandler = completionHandler
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      NotificationCenter.default.post(name: NSNotification.Name("BackgroundUploadCheckPending"), object: nil)
+    }
   }
 }
 

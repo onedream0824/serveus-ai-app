@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import Upload from 'react-native-background-upload';
+import Upload from './BackgroundUpload';
 import { UPLOAD_ENDPOINT } from '../config/api';
 
 const PLATFORM_HEADER = Platform.OS === 'ios' ? 'iOS' : 'Android';
@@ -10,22 +10,28 @@ type BackgroundUploadOptions = {
   type?: string;
 };
 
-type UploadStartOptions = {
-  url: string;
-  path: string;
-  method: 'POST';
-  type: 'multipart';
-  field: string;
-  headers?: Record<string, string>;
-};
-
 export async function startBackgroundUpload(
   jobId: string,
-  { uri }: BackgroundUploadOptions,
+  { uri, fileName, type }: BackgroundUploadOptions,
 ): Promise<string> {
-  const options: UploadStartOptions = {
+  const finalFileName = fileName || uri.split('/').pop() || 'file.jpg';
+  
+  const extension = finalFileName.split('.').pop()?.toLowerCase() || 'jpg';
+  const mimeTypes: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    pdf: 'application/pdf',
+  };
+  const finalFileType = type || mimeTypes[extension] || 'image/jpeg';
+
+  const fileUri = uri;
+
+  const uploadId = await Upload.startUpload({
     url: UPLOAD_ENDPOINT,
-    path: uri,
+    path: fileUri,
     method: 'POST',
     type: 'multipart',
     field: 'file',
@@ -33,9 +39,8 @@ export async function startBackgroundUpload(
       'X-Platform': PLATFORM_HEADER,
       Accept: 'application/json',
     },
-  };
-
-  const uploadId = await Upload.startUpload(options as any);
+  });
+  
   return uploadId;
 }
 

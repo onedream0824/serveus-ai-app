@@ -18,6 +18,9 @@ RCT_EXTERN_METHOD(
   rejecter:(RCTPromiseRejectBlock)reject
 )
 
-RCT_EXTERN_METHOD(supportedEvents)
+RCT_EXTERN_METHOD(
+  reconnectSession:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+)
 
 @end

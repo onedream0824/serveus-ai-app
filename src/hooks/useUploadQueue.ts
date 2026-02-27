@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
-import Upload from 'react-native-background-upload';
+import Upload from '../services/BackgroundUpload';
 import type { UploadPhoto, UploadPhotoStatus } from '../types/upload';
 import { handleImageResult } from '../utils/imagePicker';
 import { makePhotoId } from '../utils/format';
@@ -31,6 +32,81 @@ export function useUploadQueue() {
       if (mounted && stored.length > 0) {
         setUploadQueue(stored);
       }
+
+      if (mounted && stored.length > 0) {
+        try {
+          const pendingUploads = await Upload.checkPendingUploads();
+          if (pendingUploads.length > 0) {
+            setUploadQueue((prev) => {
+              const updated = prev.map((photo) => {
+                const pending = pendingUploads.find(
+                  (p) => p.uploadId === photo.uploadId,
+                );
+                if (!pending) return photo;
+
+                if (pending.status === 'completed') {
+                  try {
+                    const response = pending.response || '';
+                    const parsed = response ? JSON.parse(response) : {};
+                    const fileId =
+                      typeof parsed.file_id === 'string'
+                        ? (parsed.file_id as string)
+                        : undefined;
+                    const fileUrl =
+                      typeof parsed.file_url === 'string'
+                        ? (parsed.file_url as string)
+                        : undefined;
+
+                    return {
+                      ...photo,
+                      status: 'Success' as const,
+                      fileId,
+                      fileUrl,
+                    };
+                  } catch {
+                    return {
+                      ...photo,
+                      status: 'Failed' as const,
+                      error: 'Invalid server response',
+                    };
+                  }
+                } else if (pending.status === 'failed') {
+                  return {
+                    ...photo,
+                    status: 'Failed' as const,
+                    error: pending.error || 'Upload failed',
+                  };
+                }
+
+                return photo;
+              });
+
+              return updated;
+            });
+
+            pendingUploads.forEach((pending) => {
+              const photo = stored.find((p) => p.uploadId === pending.uploadId);
+              if (!photo) return;
+
+              if (pending.status === 'completed') {
+                Toast.show({
+                  type: 'success',
+                  text1: 'Upload completed',
+                  text2: photo.fileName || 'Photo',
+                });
+              } else if (pending.status === 'failed') {
+                Toast.show({
+                  type: 'error',
+                  text1: 'Upload failed',
+                  text2: pending.error || 'Unknown error',
+                });
+              }
+            });
+          }
+        } catch (error) {
+          console.log('Could not check pending uploads:', error);
+        }
+      }
     })();
     return () => {
       mounted = false;
@@ -40,6 +116,115 @@ export function useUploadQueue() {
   useEffect(() => {
     saveUploadQueue(uploadQueue);
   }, [uploadQueue]);
+
+  const checkAndProcessPendingUploads = useCallback(async () => {
+    try {
+      const pendingUploads = await Upload.checkPendingUploads();
+      if (pendingUploads.length === 0) return;
+
+      setUploadQueue((prev) => {
+        const updated = prev.map((photo) => {
+          const pending = pendingUploads.find(
+            (p) => p.uploadId === photo.uploadId,
+          );
+          if (!pending) return photo;
+
+          if (pending.status === 'completed') {
+            try {
+              const response = pending.response || '';
+              const parsed = response ? JSON.parse(response) : {};
+              const fileId =
+                typeof parsed.file_id === 'string'
+                  ? (parsed.file_id as string)
+                  : undefined;
+              const fileUrl =
+                typeof parsed.file_url === 'string'
+                  ? (parsed.file_url as string)
+                  : undefined;
+
+              return {
+                ...photo,
+                status: 'Success' as const,
+                fileId,
+                fileUrl,
+              };
+            } catch {
+              return {
+                ...photo,
+                status: 'Failed' as const,
+                error: 'Invalid server response',
+              };
+            }
+          } else if (pending.status === 'failed') {
+            return {
+              ...photo,
+              status: 'Failed' as const,
+              error: pending.error || 'Upload failed',
+            };
+          }
+
+          return photo;
+        });
+
+        pendingUploads.forEach((pending) => {
+          const photo = updated.find((p) => p.uploadId === pending.uploadId);
+          if (!photo) return;
+
+          if (pending.status === 'completed') {
+            Toast.show({
+              type: 'success',
+              text1: 'Upload completed',
+              text2: photo.fileName || 'Photo',
+            });
+          } else if (pending.status === 'failed') {
+            Toast.show({
+              type: 'error',
+              text1: 'Upload failed',
+              text2: pending.error || 'Unknown error',
+            });
+          }
+        });
+
+        return updated;
+      });
+    } catch (error) {
+      console.log('Could not check pending uploads:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      'change',
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === 'active') {
+          Upload.reconnectSession()
+            .then(() => {
+              setTimeout(() => {
+                checkAndProcessPendingUploads();
+              }, 500);
+            })
+            .catch(() => {
+              checkAndProcessPendingUploads();
+            });
+        }
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [checkAndProcessPendingUploads]);
+  
+  useEffect(() => {
+    Upload.reconnectSession()
+      .then(() => {
+        setTimeout(() => {
+          checkAndProcessPendingUploads();
+        }, 1000);
+      })
+      .catch(() => {
+      });
+  }, [checkAndProcessPendingUploads]);
 
   const setPhotoStatus = useCallback(
     (

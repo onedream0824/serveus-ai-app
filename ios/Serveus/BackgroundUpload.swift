@@ -11,10 +11,18 @@ class BackgroundUpload: RCTEventEmitter, URLSessionDelegate, URLSessionTaskDeleg
   override init() {
     super.init()
     BackgroundUpload.shared = self
+    recreateSession()
+  }
+  
+  private func recreateSession() {
     let config = URLSessionConfiguration.background(withIdentifier: "com.serveus.backgroundupload")
     config.isDiscretionary = false
     config.sessionSendsLaunchEvents = true
     session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+    
+    session?.getAllTasks { tasks in
+      print("BackgroundUpload: Reconnected to \(tasks.count) background tasks")
+    }
   }
 
   override func supportedEvents() -> [String]! {
@@ -90,7 +98,14 @@ class BackgroundUpload: RCTEventEmitter, URLSessionDelegate, URLSessionTaskDeleg
     }
     resolve(pending)
   }
-
+  
+  @objc func reconnectSession(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    recreateSession()
+    resolve(true)
+  }
 
   func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
     let taskId = dataTask.taskIdentifier
