@@ -1,11 +1,13 @@
-export type UploadJobStatus = 'Queued' | 'Uploading' | 'Success' | 'Failed';
+export type UploadPhotoStatus = 'Queued' | 'Uploading' | 'Success' | 'Failed';
 
-export interface UploadJob {
+export interface UploadPhoto {
   id: string;
   uri: string;
   fileName?: string;
   type?: string;
-  status: UploadJobStatus;
+  status: UploadPhotoStatus;
   timestamp: number;
   error?: string;
+  fileId?: string;
+  fileUrl?: string;
 }

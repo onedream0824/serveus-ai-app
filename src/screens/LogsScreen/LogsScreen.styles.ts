@@ -92,10 +92,28 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 8,
   },
+  logCardFileUrl: {
+    fontSize: 12,
+    color: colors.accent,
+    marginTop: 6,
+  },
   logCardError: {
     fontSize: 12,
     color: colors.error,
     marginTop: 8,
     lineHeight: 18,
+  },
+  retryButton: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    backgroundColor: colors.accentSoft,
+  },
+  retryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accent,
   },
 });

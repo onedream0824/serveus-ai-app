@@ -1,4 +1,4 @@
-export function makeJobId(): string {
+export function makePhotoId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 

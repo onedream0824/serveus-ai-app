@@ -4,22 +4,24 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import Toast from 'react-native-toast-message';
 import { HomeScreen, LogsScreen } from './src/screens';
 import { useUploadQueue } from './src/hooks';
+import type { UploadPhoto } from './src/types/upload';
 
 function AppContent() {
   const insets = useSafeAreaInsets();
   const [screen, setScreen] = useState<'home' | 'logs'>('home');
-  const { uploadQueue, onOpenCamera, onChooseFromGallery } = useUploadQueue();
+  const { uploadQueue, onOpenCamera, onChooseFromGallery, retryUpload } = useUploadQueue();
 
   const pendingCount = uploadQueue.filter(
-    (j) => j.status === 'Queued' || j.status === 'Uploading'
+    (p: UploadPhoto) => p.status === 'Queued' || p.status === 'Uploading'
   ).length;
 
   if (screen === 'logs') {
     return (
       <LogsScreen
         insets={insets}
-        jobs={uploadQueue}
+        photos={uploadQueue}
         onBack={() => setScreen('home')}
+        onRetry={retryUpload}
       />
     );
   }
