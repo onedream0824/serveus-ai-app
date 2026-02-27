@@ -4,7 +4,7 @@ import { colors } from '../../theme';
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: 'transparent',
     paddingHorizontal: 24,
   },
   logsHeader: {
@@ -58,12 +58,12 @@ export const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   logCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    marginBottom: 14,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+  },
+  logCardInner: {
     padding: 18,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   logCardTop: {
     flexDirection: 'row',
@@ -71,20 +71,30 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
+  logCardLabelBlock: {
+    flex: 1,
+    minWidth: 0,
+  },
   logCardLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
-    flex: 1,
+  },
+  logCardId: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
   },
   statusPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    minWidth: 76,
+    alignItems: 'center',
   },
   statusPillText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'capitalize',
   },
   logCardTime: {
@@ -105,15 +115,15 @@ export const styles = StyleSheet.create({
   },
   retryButton: {
     alignSelf: 'flex-start',
-    marginTop: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    backgroundColor: colors.accentSoft,
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    backgroundColor: colors.accent,
   },
   retryButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: colors.accent,
+    fontWeight: '700',
+    color: '#fff',
   },
 });

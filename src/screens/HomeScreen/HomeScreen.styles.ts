@@ -4,7 +4,7 @@ import { colors } from '../../theme';
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: 'transparent',
     paddingHorizontal: 28,
   },
   hero: {
@@ -35,13 +35,14 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
+    minHeight: 92,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+  },
+  primaryButtonInner: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 20,
   },
   buttonIcon: {
     width: 52,
@@ -64,19 +65,19 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   primaryButtonLabel: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 19,
+    fontWeight: '700',
     color: colors.text,
   },
   primaryButtonHint: {
     fontSize: 13,
-    color: colors.textMuted,
+    color: colors.textSecondary,
     marginTop: 3,
   },
   primaryButtonChevron: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: colors.textMuted,
+    fontSize: 22,
+    fontWeight: '600',
+    color: colors.accent,
   },
   logsCta: {
     flexDirection: 'row',
