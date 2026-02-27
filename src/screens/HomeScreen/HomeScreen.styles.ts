@@ -4,7 +4,7 @@ import { colors } from '../../theme';
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: 'transparent',
     paddingHorizontal: 28,
   },
   hero: {
@@ -35,13 +35,12 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
+    minHeight: 92,
+  },
+  primaryButtonInner: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 20,
   },
   buttonIcon: {
     width: 52,
