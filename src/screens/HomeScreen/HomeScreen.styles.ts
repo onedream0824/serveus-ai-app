@@ -36,6 +36,8 @@ export const styles = StyleSheet.create({
   },
   primaryButton: {
     minHeight: 92,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
   },
   primaryButtonInner: {
     flexDirection: 'row',
@@ -63,19 +65,19 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   primaryButtonLabel: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 19,
+    fontWeight: '700',
     color: colors.text,
   },
   primaryButtonHint: {
     fontSize: 13,
-    color: colors.textMuted,
+    color: colors.textSecondary,
     marginTop: 3,
   },
   primaryButtonChevron: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: colors.textMuted,
+    fontSize: 22,
+    fontWeight: '600',
+    color: colors.accent,
   },
   logsCta: {
     flexDirection: 'row',
