@@ -11,4 +11,5 @@ export interface UploadPhoto {
   fileId?: string;
   fileUrl?: string;
   uploadId?: string;
+  progress?: number;
 }

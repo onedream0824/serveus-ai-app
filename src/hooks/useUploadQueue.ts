@@ -35,7 +35,8 @@ export function useUploadQueue() {
 
       if (mounted && stored.length > 0) {
         try {
-          const pendingUploads = await Upload.checkPendingUploads();
+          const pendingUploads: Array<Record<string, string>> =
+            await Upload.checkPendingUploads();
           if (pendingUploads.length > 0) {
             setUploadQueue((prev) => {
               const updated = prev.map((photo) => {
@@ -122,7 +123,8 @@ export function useUploadQueue() {
 
   const checkAndProcessPendingUploads = useCallback(async () => {
     try {
-      const pendingUploads = await Upload.checkPendingUploads();
+      const pendingUploads: Array<Record<string, string>> =
+        await Upload.checkPendingUploads();
       if (pendingUploads.length === 0) return;
 
       setUploadQueue((prev) => {
@@ -236,7 +238,13 @@ export function useUploadQueue() {
     (
       id: string,
       status: UploadPhotoStatus,
-      extra?: { error?: string; fileId?: string; fileUrl?: string; uploadId?: string },
+      extra?: {
+        error?: string;
+        fileId?: string;
+        fileUrl?: string;
+        uploadId?: string;
+        progress?: number;
+      },
     ) => {
       setUploadQueue((prev) =>
         prev.map((p) =>
@@ -248,6 +256,7 @@ export function useUploadQueue() {
                 ...(extra?.fileId !== undefined && { fileId: extra.fileId }),
                 ...(extra?.fileUrl !== undefined && { fileUrl: extra.fileUrl }),
                 ...(extra?.uploadId !== undefined && { uploadId: extra.uploadId }),
+                ...(extra && 'progress' in extra && { progress: extra.progress }),
               }
             : p,
         ),
@@ -285,6 +294,20 @@ export function useUploadQueue() {
 
         let completedSub: { remove: () => void } | undefined;
         let errorSub: { remove: () => void } | undefined;
+        let progressSub: { remove: () => void } | undefined;
+
+        const removeAllListeners = () => {
+          completedSub?.remove();
+          errorSub?.remove();
+          progressSub?.remove();
+        };
+
+        const handleProgress = (data: { progress?: number }) => {
+          const pct = typeof data.progress === 'number' ? Math.round(data.progress) : undefined;
+          if (pct !== undefined) {
+            setPhotoStatus(photo.id, 'Uploading', { progress: pct });
+          }
+        };
 
         const handleCompleted = (data: any) => {
           try {
@@ -295,18 +318,33 @@ export function useUploadQueue() {
             const fileUrl =
               typeof parsed.file_url === 'string' ? (parsed.file_url as string) : undefined;
 
-            setPhotoStatus(photo.id, 'Success', { fileId, fileUrl });
+            console.log('[Upload] Server response:', {
+              fileName: label,
+              time: new Date().toISOString(),
+              responseBody: body,
+              parsed,
+              fileId,
+              fileUrl,
+            });
+
+            setPhotoStatus(photo.id, 'Success', {
+              fileId,
+              fileUrl,
+              progress: undefined,
+            });
             Toast.show({ type: 'success', text1: 'Upload successful', text2: label });
           } catch {
-            setPhotoStatus(photo.id, 'Failed', { error: 'Invalid server response' });
+            setPhotoStatus(photo.id, 'Failed', {
+              error: 'Invalid server response',
+              progress: undefined,
+            });
             Toast.show({
               type: 'error',
               text1: 'Upload failed',
               text2: 'Invalid server response',
             });
           } finally {
-            completedSub?.remove();
-            errorSub?.remove();
+            removeAllListeners();
             processingIdRef.current = null;
           }
         };
@@ -314,23 +352,29 @@ export function useUploadQueue() {
         const handleError = (event: any) => {
           const message =
             (event && (event.error as string | undefined)) || 'Upload failed';
-          setPhotoStatus(photo.id, 'Failed', { error: message });
+          console.log('[Upload] Upload failed:', {
+            fileName: label,
+            time: new Date().toISOString(),
+            error: message,
+            event,
+          });
+          setPhotoStatus(photo.id, 'Failed', { error: message, progress: undefined });
           Toast.show({
             type: 'error',
             text1: 'Upload failed',
             text2: message,
           });
-          completedSub?.remove();
-          errorSub?.remove();
+          removeAllListeners();
           processingIdRef.current = null;
         };
 
+        progressSub = Upload.addListener('progress', uploadId, handleProgress) as any;
         completedSub = Upload.addListener('completed', uploadId, handleCompleted) as any;
         errorSub = Upload.addListener('error', uploadId, handleError) as any;
       })
       .catch((startErr) => {
         const message = startErr?.message ?? 'Upload failed to start';
-        setPhotoStatus(photo.id, 'Failed', { error: message });
+        setPhotoStatus(photo.id, 'Failed', { error: message, progress: undefined });
         Toast.show({
           type: 'error',
           text1: 'Upload failed to start',

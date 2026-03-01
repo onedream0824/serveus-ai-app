@@ -7,9 +7,38 @@ export const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingHorizontal: 28,
   },
+  mainContent: {
+    flex: 1,
+  },
+  progressBarContainer: {
+    paddingTop: 16,
+  },
   hero: {
     marginTop: 40,
     marginBottom: 44,
+  },
+  heroRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  heroTextBlock: {
+    flex: 1,
+    minWidth: 0,
+  },
+  settingsIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  settingsIcon: {
+    fontSize: 22,
   },
   heroAccent: {
     width: 40,
@@ -79,17 +108,36 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.accent,
   },
-  logsCta: {
+  viewLogsButton: {
+    minHeight: 72,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+    marginTop: 28,
+  },
+  viewLogsInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 36,
-    paddingVertical: 16,
-    paddingHorizontal: 4,
+    padding: 18,
   },
-  logsCtaLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.accent,
+  viewLogsIcon: {
+    backgroundColor: colors.accentSoft,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    marginRight: 14,
+  },
+  viewLogsTextWrap: {
+    flex: 1,
+  },
+  viewLogsLabel: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  viewLogsHint: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
   },
   logsBadge: {
     backgroundColor: colors.accent,
@@ -105,10 +153,5 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#fff',
-  },
-  logsCtaArrow: {
-    fontSize: 18,
-    color: colors.accent,
-    marginLeft: 6,
   },
 });
