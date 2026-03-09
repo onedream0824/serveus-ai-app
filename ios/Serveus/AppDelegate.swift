@@ -2,6 +2,7 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import MWDATCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -31,6 +32,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       launchOptions: launchOptions
     )
 
+    configureWearables()
+
+    return true
+  }
+
+  private func configureWearables() {
+    do {
+      try Wearables.configure()
+    } catch {
+      assertionFailure("Failed to configure Wearables SDK: \(error)")
+    }
+  }
+
+  func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    Task {
+      do {
+        _ = try await Wearables.shared.handleUrl(url)
+      } catch {
+        #if DEBUG
+        print("Wearables handleUrl failed: \(error.localizedDescription)")
+        #endif
+      }
+    }
     return true
   }
 

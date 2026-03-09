@@ -24,6 +24,19 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>serveus</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -39,13 +52,32 @@
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Serveus needs photo library access to select photos for upload.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Serveus uses the microphone for voice commands in the field.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Serveus uses speech recognition so you can control the app by voice (e.g. &quot;Take photo&quot;, &quot;I'm on my way&quot;).</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Serveus uses Bluetooth to connect to Meta Ray-Ban glasses for voice and photo.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>bluetooth-peripheral</string>
+		<string>external-accessory</string>
 		<string>fetch</string>
 		<string>processing</string>
 	</array>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.meta.ar.wearable</string>
+	</array>
+	<key>MWDAT</key>
+	<dict>
+		<key>AppLinkURLScheme</key>
+		<string>serveus://</string>
+		<key>MetaAppID</key>
+		<string></string>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
