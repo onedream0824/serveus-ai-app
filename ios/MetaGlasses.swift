@@ -29,8 +29,6 @@ class MetaGlasses: RCTEventEmitter {
 
   override init() {
     super.init()
-    setupRegistrationListener()
-    setupDevicesListener()
   }
 
   override static func requiresMainQueueSetup() -> Bool {
@@ -39,6 +37,18 @@ class MetaGlasses: RCTEventEmitter {
 
   override func supportedEvents() -> [String]! {
     return ["onGlassesConnectionChange"]
+  }
+
+  override func startObserving() {
+    setupRegistrationListener()
+    setupDevicesListener()
+  }
+
+  override func stopObserving() {
+    registrationTask?.cancel()
+    registrationTask = nil
+    devicesTask?.cancel()
+    devicesTask = nil
   }
 
   private func sendStateEvent() {
@@ -215,6 +225,7 @@ class MetaGlasses: RCTEventEmitter {
     }
   }
 
+  @MainActor
   private func setupStreamListeners(session: StreamSession) {
     stateListenerToken = session.statePublisher.listen { [weak self] state in
       Task { @MainActor in

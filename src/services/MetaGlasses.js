@@ -8,6 +8,9 @@ class MetaGlassesService {
   constructor() {
     this.nativeModule = MetaGlassesModule;
     this.eventEmitter = MetaGlassesModule ? new NativeEventEmitter(MetaGlassesModule) : null;
+    if (this.eventEmitter) {
+      this._placeholderSub = this.eventEmitter.addListener(GLASSES_EVENT, () => {});
+    }
   }
 
   isAvailable() {

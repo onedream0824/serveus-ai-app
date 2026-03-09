@@ -14,12 +14,12 @@
 		83B6B9842F5CBF9400EDDD6A /* MWDATCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 83B6B9832F5CBF9400EDDD6A /* MWDATCamera */; };
 		83B6B9862F5CBF9400EDDD6A /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = 83B6B9852F5CBF9400EDDD6A /* MWDATCore */; };
 		83B6B9882F5CBF9400EDDD6A /* MWDATMockDevice in Frameworks */ = {isa = PBXBuildFile; productRef = 83B6B9872F5CBF9400EDDD6A /* MWDATMockDevice */; };
+		83B6B98C2F5CBF9400EDDD6A /* MetaGlasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B6B98A2F5CBF9400EDDD6A /* MetaGlasses.m */; };
+		83B6B98D2F5CBF9400EDDD6A /* MetaGlasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B6B98B2F5CBF9400EDDD6A /* MetaGlasses.swift */; };
 		8414DE2D2F51C2A5002466B4 /* BackgroundUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = 8414DE2A2F51C1FB002466B4 /* BackgroundUpload.m */; };
 		8414DE2E2F51C2B6002466B4 /* BackgroundUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8414DE2B2F51C215002466B4 /* BackgroundUpload.swift */; };
 		8414DE302F51D100002466B4 /* VoiceCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8414DE2F2F51D100002466B4 /* VoiceCommand.m */; };
 		8414DE312F51D100002466B4 /* VoiceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8414DE322F51D100002466B4 /* VoiceCommand.swift */; };
-		83B6B98C2F5CBF9400EDDD6A /* MetaGlasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B6B98A2F5CBF9400EDDD6A /* MetaGlasses.m */; };
-		83B6B98D2F5CBF9400EDDD6A /* MetaGlasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B6B98B2F5CBF9400EDDD6A /* MetaGlasses.swift */; };
 		9E6556FC0C07ADB6AB9A27A1 /* libPods-Serveus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E34834A47EC4350CA80AEFD /* libPods-Serveus.a */; };
 /* End PBXBuildFile section */
 
@@ -32,14 +32,14 @@
 		6285907CA5EA183C9AF11B61 /* Pods-Serveus.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Serveus.release.xcconfig"; path = "Target Support Files/Pods-Serveus/Pods-Serveus.release.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Serveus/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Serveus/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		83B6B98A2F5CBF9400EDDD6A /* MetaGlasses.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetaGlasses.m; sourceTree = "<group>"; };
+		83B6B98B2F5CBF9400EDDD6A /* MetaGlasses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaGlasses.swift; sourceTree = "<group>"; };
 		8414DE292F51C1CD002466B4 /* BackgroundUpload-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BackgroundUpload-Bridging-Header.h"; sourceTree = "<group>"; };
 		8414DE2A2F51C1FB002466B4 /* BackgroundUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackgroundUpload.m; sourceTree = "<group>"; };
 		8414DE2B2F51C215002466B4 /* BackgroundUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundUpload.swift; sourceTree = "<group>"; };
 		8414DE2C2F51C275002466B4 /* Serveus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Serveus.entitlements; path = Serveus/Serveus.entitlements; sourceTree = "<group>"; };
 		8414DE2F2F51D100002466B4 /* VoiceCommand.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VoiceCommand.m; sourceTree = "<group>"; };
 		8414DE322F51D100002466B4 /* VoiceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommand.swift; sourceTree = "<group>"; };
-		83B6B98A2F5CBF9400EDDD6A /* MetaGlasses.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetaGlasses.m; sourceTree = "<group>"; };
-		83B6B98B2F5CBF9400EDDD6A /* MetaGlasses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaGlasses.swift; sourceTree = "<group>"; };
 		8E34834A47EC4350CA80AEFD /* libPods-Serveus.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Serveus.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -156,7 +156,8 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
@@ -244,9 +245,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Serveus/Pods-Serveus-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Serveus/Pods-Serveus-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -261,9 +266,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Serveus/Pods-Serveus-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Serveus/Pods-Serveus-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -385,6 +394,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -428,6 +438,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
@@ -467,6 +478,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -502,6 +514,8 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;

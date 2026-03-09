@@ -8,6 +8,7 @@ const initialState = {
   isRegistered: false,
   glassesConnected: false,
   connectedDeviceCount: 0,
+  connectedDeviceId: null,
   isStreaming: false,
   error: null,
   isRegistering: false,
@@ -36,6 +37,7 @@ export function GlassesProvider({ children }) {
         isRegistered: s.isRegistered,
         glassesConnected: s.glassesConnected,
         connectedDeviceCount: s.connectedDeviceCount,
+        connectedDeviceId: s.connectedDeviceId ?? null,
         isStreaming: s.isStreaming,
         error: s.error,
       });
@@ -45,6 +47,7 @@ export function GlassesProvider({ children }) {
         isRegistered: !!payload?.isRegistered,
         glassesConnected: !!payload?.glassesConnected,
         connectedDeviceCount: payload?.connectedDeviceCount ?? 0,
+        connectedDeviceId: payload?.connectedDeviceId ?? null,
         isStreaming: !!payload?.isStreaming,
         error: payload?.error ?? null,
       });
@@ -62,6 +65,7 @@ export function GlassesProvider({ children }) {
         isRegistered: s.isRegistered,
         glassesConnected: s.glassesConnected,
         connectedDeviceCount: s.connectedDeviceCount,
+        connectedDeviceId: s.connectedDeviceId ?? null,
         error: null,
       });
     } catch (err) {
@@ -118,6 +122,7 @@ export function GlassesProvider({ children }) {
       isRegistered: s.isRegistered,
       glassesConnected: s.glassesConnected,
       connectedDeviceCount: s.connectedDeviceCount,
+      connectedDeviceId: s.connectedDeviceId ?? null,
       isStreaming: s.isStreaming,
       error: s.error,
     })),
